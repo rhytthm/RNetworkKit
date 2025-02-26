@@ -24,6 +24,7 @@ public final class NetworkManager: Networkable {
             guard let decodedResponse = try? JSONDecoder().decode(T.self, from: data) else { return }
             resultHandler(.success(decodedResponse))
         }
+        urlTask.resume()
     }
 }
 
