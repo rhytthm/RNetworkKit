@@ -14,6 +14,7 @@ public protocol Networkable {
 }
 
 public final class NetworkManager: Networkable {
+    public init() {}
     public func sendRequest<T>(endpoint: EndPoint, resultHandler: @Sendable @escaping (Result<T, any Error>) -> Void) where T : Decodable {
         guard let urlRequest = makeRequest(endpoint: endpoint ) else { return }
         let urlTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
