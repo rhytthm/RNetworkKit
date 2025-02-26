@@ -29,15 +29,37 @@ public final class NetworkManager: Networkable {
 }
 
 extension Networkable {
-    fileprivate func makeRequest(endpoint:EndPoint) -> URLRequest? {
+    fileprivate func makeRequest(endpoint: EndPoint) -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = endpoint.scheme
         urlComponents.host = endpoint.baseUrl
         urlComponents.path = endpoint.path
+
+        // Set query parameters
+        if let queryParams = endpoint.queryParams {
+            urlComponents.queryItems = queryParams.map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
+
         guard let url = urlComponents.url else { return nil }
         var request = URLRequest(url: url)
+
+        // Set headers
         request.allHTTPHeaderFields = endpoint.headers
+
+        // Set HTTP method (GET, POST, etc.)
         request.httpMethod = endpoint.method.rawValue
+
+        // Set body parameters (assuming they are in form of key-value pairs and encoded as JSON)
+        if let bodyParams = endpoint.bodyParams {
+            do {
+                request.httpBody = try JSONSerialization.data(withJSONObject: bodyParams, options: [])
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            } catch {
+                print("Failed to encode body parameters")
+                return nil
+            }
+        }
+
         return request
     }
 }
